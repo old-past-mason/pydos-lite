@@ -3,6 +3,8 @@ import time
 import sys
 import random
 import os
+import json
+import bcrypt
 
 def clear_screen():
     _ = os.system('cls')
@@ -15,7 +17,7 @@ def award_bios():
 
     clear_screen()
     print("Award Modular BIOS v4.50PG, An Energy Star Ally")
-    print("Copyright (C) 1984-94, Award Software, Inc.\n")
+    print("Copyright (R) 1984-94, Award Software, Inc.\n")
     print("80486DX2 CPU at 32MHz")
     
     for i in range(0, 32769, 1024):
@@ -78,16 +80,34 @@ def fast_loading():
 
 if __name__ == "__main__":
     fast_loading()
-    
+
+DB_FILE = "users_db.json"
+
+def load_users():
+    if not os.path.exists(DB_FILE):
+        return {"ADMIN": "HWrnDLEMWmVpdMzpQqWLn9u6qvjk5n2E", "mason": "0327"}
+    with open(DB_FILE, "r") as f:
+        return json.load(f)
+
+def save_users(db):
+    with open(DB_FILE, "w") as f:
+        json.dump(db, f, indent=4)
+
+users_db = load_users()
+
 # login system prep
 login_active = True
 login_success = False
 console_active = False
 creation = False
+
+"""
 users_db = {
     "ADMIN": "HWrnDLEMWmVpdMzpQqWLn9u6qvjk5n2E",
     "mason": "0327"
 }
+"""
+
 clear_screen()
 time.sleep(1.5)
 
@@ -114,6 +134,7 @@ while login_active == True:
                 new_u = input('Choose a username: ')
                 new_p = input('Choose a password: ')
                 users_db[new_u] = new_p
+                save_users(users_db)
                 print(f"User {new_u} created successfully!")
                 creation = False
                 clear_screen()
