@@ -26,7 +26,6 @@ def award_bios():
         time.sleep(0.09)
     
     print("\n")
-    print("Press DEL to enter SETUP")
     time.sleep(2.5)
 
     clear_screen()
@@ -84,8 +83,11 @@ if __name__ == "__main__":
 DB_FILE = "users_db.json"
 
 def load_users():
+    admin_hash = "$2a$12$.kkOEmoWzIJxtTF1LyLZHeqZ9cZTMt3k0qDuV3qxVF0CkTHHwHRrm"
+    mason_hash = "$2a$12$CF0v5zAYLt/4oNwfQJL1JeXVsf1o7ilNiYiGqHvO5lIpoUOsJoQJy"
     if not os.path.exists(DB_FILE):
-        return {"ADMIN": "HWrnDLEMWmVpdMzpQqWLn9u6qvjk5n2E", "mason": "0327"}
+        # Ensure default values are ACTUAL bcrypt hashes
+        return {"ADMIN": admin_hash, "mason": mason_hash}
     with open(DB_FILE, "r") as f:
         return json.load(f)
 
@@ -117,8 +119,12 @@ while login_active == True:
     b = input('Enter password: ')
     
     if a in users_db:
-        if b == users_db[a]:
-            print(f'Login successful. Welcome {a}!')
+        stored_hash = users_db[a].encode('utf-8')
+        if bcrypt.checkpw(b.encode('utf-8'), stored_hash):
+            try:
+                print(f'Login successful. Welcome {a}!')
+            except:
+                print(f'ERROR: Hash error.')
             login_active = False
             login_success = True
         else:
@@ -133,7 +139,8 @@ while login_active == True:
             if usernew == "Y":
                 new_u = input('Choose a username: ')
                 new_p = input('Choose a password: ')
-                users_db[new_u] = new_p
+                hashed = bcrypt.hashpw(new_p.encode('utf-8'), bcrypt.gensalt())
+                users_db[new_u] = hashed.decode('utf-8')
                 save_users(users_db)
                 print(f"User {new_u} created successfully!")
                 creation = False
@@ -154,13 +161,23 @@ if login_success == True:
         print(f'Welcome, {a}!\nWould you like a tutorial for this DOS?')
         choice = input('Choose an option (Y,N): ')
         if choice == "Y":
+            clear_screen()
             print("This is PYDOS, a simple DOS system for python!")
-            print("To use this, you will use a console with commands!")
+            time.sleep(1)
+            print("To use this, you will use a console with commands! Commands ARE case-sensitive!")
+            time.sleep(1)
             print(f'Use the "help" command to see all of the commands!')
+            time.sleep(1)
+            print(f'Use the "ahelp" command to see a detailed report of a command!')
+            time.sleep(1.5)
+            clear_screen()
             login_success = False
             console_active = True
         elif choice == "N":
+            clear_screen()
             print("Starting console...")
+            time.sleep(2.5)
+            clear_screen()
             login_success = False
             console_active = True
         else:
@@ -169,6 +186,37 @@ if login_success == True:
 while console_active:
     console = input('C:\> ')
     if console == str("help"):
-        print("* ACALC\n* There are no other commands!")
-    elif console == str("ACALC"):
-        print("calculations coded later")
+        print("* CALC\n* clear\n* ahelp\n* help\n* There are no other commands!")
+    elif console == str("ahelp"):
+        a = input("Enter command:")
+        if a == "CALC":
+            print("Does simple math equations with 2 numbers. (ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION.)")
+        elif a == "Clear":
+            print("Clears the console screen.")
+        else:
+            print("Not a valid command!")
+    elif console == str("clear"):
+        clear_screen()
+    elif console == str("CALC"):
+        def sum(a, b):
+            return (a + b)
+        def difference(a, b):
+            return (a - b)
+        def product(a, b):
+            return (a * b)
+        def quotient(a, b):
+            return (a / b)
+        
+        a = int(input('Enter 1st number: '))
+        b = int(input('Enter 2nd number: '))
+        c = input('Enter operation (ADD, SUBTRACT, MULTIPLY, DIVIDE): ')
+        if c == "ADD":
+            print(f'The sum of {a} and {b} is {sum(a, b)}')
+        elif c == "SUBTRACT":
+            print(f'The difference of {a} and {b} is {difference(a, b)}')
+        elif c == "MULTIPLY":
+            print(f'The product of {a} and {b} is {product(a, b)}')
+        elif c == "DIVIDE":
+            print(f'The quotient of {a} and {b} is {quotient(a, b)}')
+        else:
+            print(f'You did not enter a valid operation! (ADD, SUBTRACT, MULTIPLY, DIVIDE).')
