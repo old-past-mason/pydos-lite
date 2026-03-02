@@ -5,6 +5,7 @@ import random
 import os
 import json
 import bcrypt
+import echoFunction
 
 def clear_screen():
     _ = os.system('cls')
@@ -82,19 +83,24 @@ if __name__ == "__main__":
 
 DB_FILE = "users_db.json"
 
-def load_users():
-    admin_hash = "$2a$12$.kkOEmoWzIJxtTF1LyLZHeqZ9cZTMt3k0qDuV3qxVF0CkTHHwHRrm"
-    mason_hash = "$2a$12$CF0v5zAYLt/4oNwfQJL1JeXVsf1o7ilNiYiGqHvO5lIpoUOsJoQJy"
-    if not os.path.exists(DB_FILE):
-        # Ensure default values are ACTUAL bcrypt hashes
-        return {"ADMIN": admin_hash, "mason": mason_hash}
-    with open(DB_FILE, "r") as f:
-        return json.load(f)
-
 def save_users(db):
     with open(DB_FILE, "w") as f:
         json.dump(db, f, indent=4)
 
+def load_users():
+    admin_u = "ADMIN"
+    admin_pw = "HWrnDLEMWmVpdMzpQqWLn9u6qvjk5n2E"
+    mason_u = "mason"
+    mason_pw = "0327"
+    if not os.path.exists(DB_FILE):
+        hashed = bcrypt.hashpw(admin_pw.encode('utf-8'), bcrypt.gensalt())
+        load_users()[admin_u] = hashed.decode('utf-8')
+        hashed = bcrypt.hashpw(mason_pw.encode('utf-8'), bcrypt.gensalt())
+        load_users()[mason_u] = hashed.decode('utf-8')
+        save_users(load_users())
+    with open(DB_FILE, "r") as f:
+        return json.load(f)
+    
 users_db = load_users()
 
 # login system prep
@@ -120,13 +126,13 @@ while login_active == True:
     
     if a in users_db:
         stored_hash = users_db[a].encode('utf-8')
-        if bcrypt.checkpw(b.encode('utf-8'), stored_hash):
-            try:
-                print(f'Login successful. Welcome {a}!')
-            except:
-                print(f'ERROR: Hash error.')
+        try:
+            if bcrypt.checkpw(b.encode('utf-8'), stored_hash):
+                    print(f'Login successful. Welcome {a}!')
             login_active = False
             login_success = True
+        except:
+            print(f'ERROR: Hash error.')
         else:
             print('ERROR: Password is incorrect.')
     else:
@@ -184,20 +190,32 @@ if login_success == True:
             print("You did not select a correct option!")
             print("Please select another option.")
 while console_active:
-    console = input('C:\> ')
-    if console == str("help"):
+    console = input('C:\> ').split(" ")
+    if console[0] == str("help"):
         print("* CALC\n* clear\n* ahelp\n* help\n* There are no other commands!")
-    elif console == str("ahelp"):
+    elif console[0] == str("ahelp"):
         a = input("Enter command:")
-        if a == "CALC":
-            print("Does simple math equations with 2 numbers. (ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION.)")
-        elif a == "Clear":
-            print("Clears the console screen.")
-        else:
-            print("Not a valid command!")
-    elif console == str("clear"):
+        try:
+            if a == "CALC":
+                print("Does simple math equations with 2 numbers. (ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION.)")
+            elif a == "clear":
+                print("Clears the console screen.")
+            elif a == "echo":
+                print("Makes the console say what you want it to say.")
+            elif a == "help":
+                print("Displays all of the commands currently available.")
+            elif a == "ahelp":
+                print("Displays what a certain command does based off of user-input.")
+        except:
+            print("Not a valid command! Please enter a command listed in the \"help\" menu.")
+    elif console[0] == str("clear"):
         clear_screen()
-    elif console == str("CALC"):
+    elif console[0] == str("echo"):
+        try:
+            echoFunction.EchoCommand(console[1])
+        except:
+            print("")
+    elif console[0] == str("calc"):
         def sum(a, b):
             return (a + b)
         def difference(a, b):
