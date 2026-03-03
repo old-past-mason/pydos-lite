@@ -6,6 +6,7 @@ import os
 import json
 import bcrypt
 import echoFunction
+from datetime import date
 
 def clear_screen():
     _ = os.system('cls')
@@ -60,7 +61,7 @@ print(f'{btype} {bver} {barch} {borg}(R)')
 
 # PYDOS Startup Screen
 clear_screen()
-message = "PYDOS"
+message = "Welcome to PYDOS!"
 for char in message:
     print(char, end="", flush=True)
     time.sleep(0.1) #
@@ -73,7 +74,7 @@ def fast_loading():
         sys.stdout.flush()
         time.sleep(0.01)
     for _ in range(10):
-        time.sleep(random.uniform(0.01, 1))
+        time.sleep(random.uniform(0.01, 0.5))
         sys.stdout.write(".")
         sys.stdout.flush()
     print()
@@ -175,7 +176,10 @@ if login_success == True:
             print(f'Use the "help" command to see all of the commands!')
             time.sleep(1)
             print(f'Use the "ahelp" command to see a detailed report of a command!')
-            time.sleep(1.5)
+            time.sleep(3)
+            clear_screen()
+            print("Starting console...")
+            time.sleep(2.5)
             clear_screen()
             login_success = False
             console_active = True
@@ -192,11 +196,11 @@ if login_success == True:
 while console_active:
     console = input('C:\> ').split(" ")
     if console[0] == str("help"):
-        print("* CALC\n* clear\n* ahelp\n* help\n* There are no other commands!")
+        print("* calc\n* clear\n* ahelp\n* help\n* echo\n* date\n* There are no other commands!")
     elif console[0] == str("ahelp"):
         a = input("Enter command:")
         try:
-            if a == "CALC":
+            if a == "calc":
                 print("Does simple math equations with 2 numbers. (ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION.)")
             elif a == "clear":
                 print("Clears the console screen.")
@@ -206,6 +210,8 @@ while console_active:
                 print("Displays all of the commands currently available.")
             elif a == "ahelp":
                 print("Displays what a certain command does based off of user-input.")
+            elif a == "date":
+                print("Displays the current date.")
         except:
             print("Not a valid command! Please enter a command listed in the \"help\" menu.")
     elif console[0] == str("clear"):
@@ -238,3 +244,6 @@ while console_active:
             print(f'The quotient of {a} and {b} is {quotient(a, b)}')
         else:
             print(f'You did not enter a valid operation! (ADD, SUBTRACT, MULTIPLY, DIVIDE).')
+    elif console[0] == str("date"):
+        today = date.today()
+        print(f'{today}')
