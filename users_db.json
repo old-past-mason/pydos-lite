@@ -1,5 +1,6 @@
 {
     "ADMIN": "$2a$12$.kkOEmoWzIJxtTF1LyLZHeqZ9cZTMt3k0qDuV3qxVF0CkTHHwHRrm",
     "mason": "$2b$12$0C5kEsfjT8mb2IUswne6OOVmqmhEePAtStnifCHEd2LlUHjYU8krW",
-    "Cement": "$2b$12$rnYBi/PLKnNAwUFdRJjmC.qjfXuxJXQcCG8B8gY/L1aYcLbbxwsrC"
+    "Cement": "$2b$12$rnYBi/PLKnNAwUFdRJjmC.qjfXuxJXQcCG8B8gY/L1aYcLbbxwsrC",
+    "admin": "$2b$12$n.20FrPPhadRdxbvd5vK/.zJ2ED8n7h/RBlzCjJe39zru71N2l536"
 }

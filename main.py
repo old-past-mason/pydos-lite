@@ -7,6 +7,7 @@ import json
 import bcrypt
 import echoFunction
 from datetime import date
+import pwinput
 
 def clear_screen():
     _ = os.system('cls')
@@ -123,7 +124,7 @@ time.sleep(1.5)
 while login_active == True:
     # login system actuality
     a = input('Enter username: ')
-    b = input('Enter password: ')
+    b = pwinput.pwinput('Enter password: ', mask="·")
     
     if a in users_db:
         stored_hash = users_db[a].encode('utf-8')
@@ -142,10 +143,18 @@ while login_active == True:
         print(f'Would you like to create a new user?')
         creation = True
         while creation == True:
-            usernew = input(f'Choose an option (Y, N):')
+            usernew = input(f'Choose an option (Y, N):').upper()
             if usernew == "Y":
                 new_u = input('Choose a username: ')
-                new_p = input('Choose a password: ')
+                if new_u.lower() == "admin":
+                    print(f"The name: {new_u} is restricted by the system!")
+                    creation = False
+                    clear_screen()
+                if new_u in users_db:
+                    print(f"User {new_u} already exists!")
+                    creation = False
+                    clear_screen()
+                new_p = pwinput.pwinput('Choose a password: ', mask="·")
                 hashed = bcrypt.hashpw(new_p.encode('utf-8'), bcrypt.gensalt())
                 users_db[new_u] = hashed.decode('utf-8')
                 save_users(users_db)
@@ -194,10 +203,15 @@ if login_success == True:
             print("You did not select a correct option!")
             print("Please select another option.")
 while console_active:
-    console = input('C:\> ').split(" ")
-    if console[0] == str("help"):
+    # okay what the heck did i do here
+    user_input = input('C:\> ').strip(" ")
+    if not user_input: continue
+    console = user_input.split(" ", 1)
+    command = console[0].lower()
+
+    if command == str("help"):
         print("* calc\n* clear\n* ahelp\n* help\n* echo\n* date\n* There are no other commands!")
-    elif console[0] == str("ahelp"):
+    elif command == str("ahelp"):
         a = input("Enter command:")
         try:
             if a == "calc":
@@ -214,14 +228,14 @@ while console_active:
                 print("Displays the current date.")
         except:
             print("Not a valid command! Please enter a command listed in the \"help\" menu.")
-    elif console[0] == str("clear"):
+    elif command == str("clear"):
         clear_screen()
-    elif console[0] == str("echo"):
-        try:
+    elif command == str("echo"):
+        if len(console) > 1:
             echoFunction.EchoCommand(console[1])
-        except:
+        else:
             print("")
-    elif console[0] == str("calc"):
+    elif command == str("calc"):
         def sum(a, b):
             return (a + b)
         def difference(a, b):
@@ -233,7 +247,7 @@ while console_active:
         
         a = int(input('Enter 1st number: '))
         b = int(input('Enter 2nd number: '))
-        c = input('Enter operation (ADD, SUBTRACT, MULTIPLY, DIVIDE): ')
+        c = input('Enter operation (ADD, SUBTRACT, MULTIPLY, DIVIDE): ').upper()
         if c == "ADD":
             print(f'The sum of {a} and {b} is {sum(a, b)}')
         elif c == "SUBTRACT":
@@ -244,6 +258,6 @@ while console_active:
             print(f'The quotient of {a} and {b} is {quotient(a, b)}')
         else:
             print(f'You did not enter a valid operation! (ADD, SUBTRACT, MULTIPLY, DIVIDE).')
-    elif console[0] == str("date"):
+    elif command == str("date"):
         today = date.today()
         print(f'{today}')
